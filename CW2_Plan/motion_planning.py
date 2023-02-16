@@ -290,7 +290,7 @@ class MotionPlanner():
         ############################################################### TASK E i
         # Choose your minimum and maximum distances to produce a suitable graph
         mindist = 2.5
-        maxdist = 4.5
+        maxdist = 5.5
         
         # Calculate a distance matrix between every node to every other node
         distances = cdist(points, points)
@@ -356,7 +356,7 @@ class MotionPlanner():
         print("distance")
         print(distance)
         # Calculate the UNIT direction vector pointing from pointA to pointB
-        direction = np.array([(pointA[0] + pointB[0])/distance, (pointA[1] - pointB[1])/distance])
+        direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
         print("direction")
         print(direction)
         # Choose a resolution for collision checking
@@ -366,6 +366,8 @@ class MotionPlanner():
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
         # Convert the points to pixels
         edge_pixels = self.map_position(edge_points)
+        print("edge_pixels")
+        print(edge_pixels)
         
         for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
             collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
@@ -499,7 +501,7 @@ def main(task):
         print("============================================================")
         print("Running Probabilistic Road Map")
         print("------------------------------------------------------------")
-        points = planner.generate_random_points(N_points=30)
+        points = planner.generate_random_points(N_points=100)
         graph, edges = planner.create_graph(points)
         planner.dijkstra(graph, edges)
         planner.run_planner(planner.waypoint_navigation)
