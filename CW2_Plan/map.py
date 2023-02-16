@@ -58,11 +58,22 @@ def expand_map(img, robot_width):
     ############################################################### TASK A
     # SQUARE MASK
     # create a square array of ones of the size of the robot
-    robot_mask = np.ones((1, 1))
+    robot_mask = np.ones((robot_px, robot_px))
     
     # CIRCULAR MASK - optional for individual students
     # create a square array of the size of the robot
     # where a circle the size of the robot is filled with ones
+    #### OLD VERSION - Not filled in in the middle
+    #radius=robot_px/2
+    #A = np.arange(-radius,radius+1)**2
+    #dists = np.sqrt(A[:,None] + A)
+    #robot_mask = (np.abs(dists-radius)<0.5).astype(int)
+    
+    ##### NEW VERSION - filled in in the middle
+    radius=robot_px/2
+    A = np.arange(-radius,radius+1)**2
+    dists = np.sqrt(A[:,None] + A)
+    robot_mask = (np.abs(dists<=radius)).astype(int)
     
     expanded_img = binary_dilation(img, robot_mask)
     
