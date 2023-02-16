@@ -121,9 +121,9 @@ class MotionPlanner():
     def setup_waypoints(self):
         ############################################################### TASK B
         # Create an array of waypoints for the robot to navigate via to reach the goal
-        waypoints = np.array([[0.0, 0.0],
-                              [0.0, 0.0],
-                              [0.0, 0.0]])  # fill this in with your waypoints
+        waypoints = np.array([[3, -2],
+                              [2.5, 8],
+                              [8, 8]])  # fill this in with your waypoints
 
         waypoints = np.vstack([initial_position, waypoints, self.goal])
         pixel_goal = self.map_position(self.goal)
@@ -179,9 +179,9 @@ class MotionPlanner():
         pos_force_direction = goal_vector / distance_to_goal
         
         # potential function
-        pos_force_magnitude = 0.0     # your code here!
+        pos_force_magnitude = 1/distance_to_goal     # your code here!
         # tuning parameter
-        K_att = 1.0     # tune this parameter to achieve desired results
+        K_att = 100050     # tune this parameter to achieve    desired results
         
         # positive force
         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
@@ -195,29 +195,32 @@ class MotionPlanner():
         
         # vector to each obstacle from DE NIRO
         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
+
         # distance to obstacle from DE NIRO
         distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
         # unit vector in direction of obstacle from DE NIRO
         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
-        
+
         # potential function
-        force_magnitude = 0.0   # your code here!
+        force_magnitude = -1/distance_to_obstacle**4   # your code here!
         # tuning parameter
-        K_rep = 100     # tune this parameter to achieve desired results
+        K_rep = 140000     # tune this parameter to achieve desired results
         
         # force from an individual obstacle pixel
-        obstacle_force = force_direction * force_magnitude
+        obstacle_force = force_direction * force_magnitude 
         # total negative force on DE NIRO
         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
         
+     
+
         
         # Uncomment these lines to visualise the repulsive force from each obstacle pixel
         # Make sure to comment it out again when you run the motion planner fully
-#        plotskip = 10   # only plots every 10 pixels (looks cleaner on the plot)
-#        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-#        plt.quiver(obstacle_pixel_coordinates[::plotskip, 0], obstacle_pixel_coordinates[::plotskip, 1],
-#                   obstacle_force[::plotskip, 0] * self.xscale, obstacle_force[::plotskip, 1] * self.yscale)
-#        plt.show()
+        #plotskip = 100   # only plots every 10 pixels (looks cleaner on the plot)
+        #plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+        #plt.quiver(obstacle_pixel_coordinates[::plotskip, 0], obstacle_pixel_coordinates[::plotskip, 1], obstacle_force[::plotskip, 0] * self.xscale, obstacle_force[::plotskip, 1] * self.yscale)
+        #plt.show()
+
 
         print("positive_force:", positive_force)
         print("negative_force:", negative_force)
@@ -242,13 +245,17 @@ class MotionPlanner():
             points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
             pixel_points = self.map_position(points)    # get the point locations on our map
             rejected = np.zeros(N_points - N_accepted)   # create an empty array of rejected flags
-            
+            i = 0 
             # Your code here!
+            
+            for i in range(N_points - N_accepted):
+                rejected[i] = self.pixel_map[int(pixel_points[i,1]),int(pixel_points[i,0])]
+                i += 1
             # Loop through the generated points and check if their pixel location corresponds to an obstacle in self.pixel_map
             # self.pixel_map[px_y, px_x] = 1 when an obstacle is present
             # Remember that indexing a 2D array is [row, column], which is [y, x]!
             # You might have to make sure the pixel location is an integer so it can be used to index self.pixel_map
-                
+            
             new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
             new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
             # keep an array of generated points that are accepted
@@ -282,8 +289,8 @@ class MotionPlanner():
     def create_graph(self, points):
         ############################################################### TASK E i
         # Choose your minimum and maximum distances to produce a suitable graph
-        mindist = 0.0
-        maxdist = 20.0
+        mindist = 2.5
+        maxdist = 4.5
         
         # Calculate a distance matrix between every node to every other node
         distances = cdist(points, points)
@@ -341,11 +348,19 @@ class MotionPlanner():
     def check_collisions(self, pointA, pointB):
         ############################################################### TASK E ii     
         # Calculate the distance between the two point
-        distance = 0.5
+        print("pointA")
+        print(pointA)
+        print("pointB")
+        print(pointB)
+        distance = ((pointA[1] - pointB[1])**2 + (pointA[0] - pointB[0])**2)**0.5
+        print("distance")
+        print(distance)
         # Calculate the UNIT direction vector pointing from pointA to pointB
-        direction = np.array([1.0, 0.0])
+        direction = np.array([(pointA[0] + pointB[0])/distance, (pointA[1] - pointB[1])/distance])
+        print("direction")
+        print(direction)
         # Choose a resolution for collision checking
-        resolution = 5.0   # resolution to check collision to in m
+        resolution = 0.1   # resolution to check collision to in m
         
         # Create an array of points to check collisions at
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
@@ -354,6 +369,7 @@ class MotionPlanner():
         
         for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
             collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
+            
             if collision == 1:
                 return True     # if there's a collision, immediately return True
         return False    # if it's got through every pixel as hasn't returned yet, return False
@@ -483,7 +499,7 @@ def main(task):
         print("============================================================")
         print("Running Probabilistic Road Map")
         print("------------------------------------------------------------")
-        points = planner.generate_random_points(N_points=100)
+        points = planner.generate_random_points(N_points=30)
         graph, edges = planner.create_graph(points)
         planner.dijkstra(graph, edges)
         planner.run_planner(planner.waypoint_navigation)
