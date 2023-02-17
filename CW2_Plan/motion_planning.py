@@ -348,17 +348,9 @@ class MotionPlanner():
     def check_collisions(self, pointA, pointB):
         ############################################################### TASK E ii     
         # Calculate the distance between the two point
-        print("pointA")
-        print(pointA)
-        print("pointB")
-        print(pointB)
         distance = ((pointA[1] - pointB[1])**2 + (pointA[0] - pointB[0])**2)**0.5
-        print("distance")
-        print(distance)
         # Calculate the UNIT direction vector pointing from pointA to pointB
         direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
-        print("direction")
-        print(direction)
         # Choose a resolution for collision checking
         resolution = 0.1   # resolution to check collision to in m
         
@@ -366,8 +358,6 @@ class MotionPlanner():
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
         # Convert the points to pixels
         edge_pixels = self.map_position(edge_points)
-        print("edge_pixels")
-        print(edge_pixels)
         
         for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
             collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
@@ -383,7 +373,7 @@ class MotionPlanner():
         
         # Create a dataframe of unvisited nodes
         # Initialise each cost to a very high number
-        initial_cost = 5.0  # Set this to a suitable value
+        initial_cost = 1000000000000000000000000.0  # Set this to a suitable value
         
         unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
         unvisited.set_index('Node', inplace=True)
@@ -410,6 +400,7 @@ class MotionPlanner():
             
             # Go to the node that is the minimum distance from the starting node
             current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
+            print(current_node)
             current_node_name = current_node.index.values[0]    # the node's name (string)
             current_cost = current_node['Cost'].values[0]       # the distance from the starting node to this node (float)
             current_tree = current_node['Previous'].values[0]   # a list of the nodes visited on the way to this one (string)
@@ -424,7 +415,7 @@ class MotionPlanner():
                 if next_node_name not in visited.index.values:  # if we haven't visited this node before
                     
                     # update this to calculate the cost of going from the initial node to the next node via the current node
-                    next_cost_trial = 1234  # set this to calculate the cost of going from the initial node to the next node via the current node
+                    next_cost_trial = current_cost + edge_cost  # set this to calculate the cost of going from the initial node to the next node via the current node
                     next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
                     
                     # if it costs less to go the next node from the current node, update then next node's cost and the path to get there
