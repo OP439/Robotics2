@@ -74,11 +74,14 @@ def cmd_vel_2_twist(v_forward, omega):
 
 class MotionPlanner():
     
+    
     def __init__(self, map, scale, goal):
         self.vref_publisher = set_vref_publisher()
         self.pixel_map = map
         self.xscale, self.yscale = scale
         self.goal = goal
+        
+        self.posArray = []
     
     def send_velocity(self, vref):
         # vref is given in cartesian coordinates (v_x, v_y)
@@ -143,8 +146,12 @@ class MotionPlanner():
         path_length = 0
         for i in range(1, waypoints.shape[0]):
             path_length += np.linalg.norm(waypoints[i, :] - waypoints[i - 1, :])
+            #round path length to 2 decimal places
+            path_length = round(path_length, 2)
         print('Total path length:\t', path_length)
-        
+
+
+
         # Plotting
         plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
         plt.scatter(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
@@ -153,6 +160,9 @@ class MotionPlanner():
         
         self.waypoints = waypoints
         self.waypoint_index = 0
+        
+
+
     
     def waypoint_navigation(self):
         complete = False
@@ -223,7 +233,11 @@ class MotionPlanner():
         obstacle_force = force_direction * force_magnitude 
         # total negative force on DE NIRO
         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
+
+        #print de niro position
+        print("deniro_position:", deniro_position)
         
+        self.posArray.append(deniro_position)
      
 
         
@@ -240,12 +254,26 @@ class MotionPlanner():
         
         # Reference velocity is the resultant force
         vref = positive_force + negative_force
-        
+
+
         # If the goal has been reached, stop
-        if distance_to_goal < 0.05:
+        print("distance_to_goal:", distance_to_goal)
+        if distance_to_goal < 0.20:
             vref = np.array([0, 0])
             complete = True
+            draw_path(self)
         return vref, complete
+    
+    #function that draws the path that the robot takes using posArray
+    def draw_path(self):
+        #get the x and y coordinates from the posArray
+        x = [i[0] for i in self.posArray]
+        y = [i[1] for i in self.posArray]
+        #plot the path
+        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+        plt.scatter(x,y)
+        plt.show()
+
     
     def generate_random_points(self, N_points):
         ############################################################### TASK D
