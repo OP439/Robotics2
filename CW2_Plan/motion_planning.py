@@ -26,6 +26,9 @@ goal = np.array([8.0, 8.0])
 
 
 def deniro_odom_callback(msg):
+    '''Overall, this function extracts important information about the position, orientation, and velocity of robot
+    deniro from an incoming ROS message of type nav_msgs/Odometry and stores it in global variables that can be 
+    accessed and modified from other parts of the code.'''
     global deniro_position, deniro_heading, deniro_linear_vel, deniro_angular_vel
     deniro_position = np.array([msg.pose.pose.position.x, msg.pose.pose.position.y])
     r = R.from_quat([msg.pose.pose.orientation.x,
