@@ -234,12 +234,8 @@ class MotionPlanner():
         # total negative force on DE NIRO
         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
 
-        #print de niro position
         print("deniro_position:", deniro_position)
-        
         self.posArray.append(deniro_position)
-     
-
         
         # Uncomment these lines to visualise the repulsive force from each obstacle pixel
         # Make sure to comment it out again when you run the motion planner fully
@@ -261,18 +257,29 @@ class MotionPlanner():
         if distance_to_goal < 0.20:
             vref = np.array([0, 0])
             complete = True
-            draw_path(self)
+            self.draw_path()
         return vref, complete
     
     #function that draws the path that the robot takes using posArray
     def draw_path(self):
-        #get the x and y coordinates from the posArray
-        x = [i[0] for i in self.posArray]
-        y = [i[1] for i in self.posArray]
-        #plot the path
+        # get the position coordinates from the posArray
+        posArray = np.array(self.posArray)
+        # convert the position coordinates to map pixel coordinates
+        pixel_posArray = self.map_position(posArray)
+
+        # calculate the distance travelled by the robot in metres
+        distance = 0
+        for i in range(1, len(posArray)):
+            distance += np.linalg.norm(posArray[i] - posArray[i-1])
+        print("distance travelled:", distance, "m")
+
+        # plot the path
         plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-        plt.scatter(x,y)
+        plt.scatter(pixel_posArray[:, 0], pixel_posArray[:, 1])
         plt.show()
+
+
+
 
     
     def generate_random_points(self, N_points):
