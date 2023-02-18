@@ -26,7 +26,7 @@ goal = np.array([8.0, 8.0])
 
 
 def deniro_odom_callback(msg):
-    '''Overall, this function extracts important information about the position, orientation, and velocity of robot
+    '''This function extracts important information about the position, orientation, and velocity of robot
     deniro from an incoming ROS message of type nav_msgs/Odometry and stores it in global variables that can be 
     accessed and modified from other parts of the code.'''
     global deniro_position, deniro_heading, deniro_linear_vel, deniro_angular_vel
@@ -41,6 +41,9 @@ def deniro_odom_callback(msg):
 
 
 def set_vref_publisher():
+    '''Sets up a ROS node, creates a publisher and subscriber object, and returns the publisher object so that it can be
+    used to send velocity commands to a robot. The function also includes a time delay to ensure that the node is 
+    properly initialized before it begins executing other code. '''
     rospy.init_node("motion_planning_node")
 
     wait = True
