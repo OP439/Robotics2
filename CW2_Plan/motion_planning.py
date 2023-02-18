@@ -115,6 +115,7 @@ class MotionPlanner():
         return world_position
     
     def run_planner(self, planning_algorithm):
+        '''Runs the input planning algorithm and sends velocity commands to the robot '''
         rate = rospy.Rate(25)
         while not rospy.is_shutdown():
             vref, complete = planning_algorithm()
