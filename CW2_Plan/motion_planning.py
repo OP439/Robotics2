@@ -190,7 +190,7 @@ class MotionPlanner():
         return vref, complete
 
     def potential_field(self):
-        ############################################################### TASK C
+        ############################################################### TASK C Part i below
         complete = False
         
         # compute the positive force attracting the robot towards the goal
@@ -233,6 +233,14 @@ class MotionPlanner():
         obstacle_force = force_direction * force_magnitude 
         # total negative force on DE NIRO
         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
+        ############################################################### TASK C Part i above
+        
+        ############################################################### TASK C Part ii below
+        
+        
+        
+        
+        ############################################################### TASK C Part ii above
 
         print("deniro_position:", deniro_position)
         self.posArray.append(deniro_position)
