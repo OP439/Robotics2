@@ -202,9 +202,9 @@ class MotionPlanner():
         pos_force_direction = goal_vector / distance_to_goal
         
         # potential function
-        pos_force_magnitude = 1/distance_to_goal     # your code here!
+        pos_force_magnitude = 1  #/distance_to_goal #Part i asks for a constatn     # your code here!
         # tuning parameter
-        K_att = 100050     # tune this parameter to achieve    desired results
+        K_att = 1 # I achieved best results with 1 here     # tune this parameter to achieve    desired results
         
         # positive force
         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
@@ -225,9 +225,9 @@ class MotionPlanner():
         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
 
         # potential function
-        force_magnitude = -1/distance_to_obstacle**4   # your code here!
+        force_magnitude = -1/distance_to_obstacle #we are asked to give equation 2 from the doc so there is no higher power   # your code here!
         # tuning parameter
-        K_rep = 140000     # tune this parameter to achieve desired results
+        K_rep = 15.5  # I achieved best results with this value here     # tune this parameter to achieve desired results
         
         # force from an individual obstacle pixel
         obstacle_force = force_direction * force_magnitude 
