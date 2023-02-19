@@ -131,9 +131,11 @@ class MotionPlanner():
     def setup_waypoints(self):
         ############################################################### TASK B
         # Create an array of waypoints for the robot to navigate via to reach the goal
-        waypoints = np.array([[3, -2],
-                              [2.5, 8],
-                              [8, 8]])  # fill this in with your waypoints
+        # fill this in with your waypoints
+        waypoints = np.array([initial_position,
+                                [3, -2],
+                                [2.5, 8],
+                                goal])
 
         waypoints = np.vstack([initial_position, waypoints, self.goal])
         pixel_goal = self.map_position(self.goal)
@@ -142,8 +144,7 @@ class MotionPlanner():
         print('Waypoints:\n', waypoints)
         print('Waypoints in pixel coordinates:\n', pixel_waypoints)
         
-        # calculate the total path length of the waypoints
-        # !!! DOESNT CALC FROM FIRST WAYPOINT
+        # calculate the total path length of the waypoints       
         path_length = 0
         for i in range(1, waypoints.shape[0]):
             path_length += np.linalg.norm(waypoints[i, :] - waypoints[i - 1, :])
