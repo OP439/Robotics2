@@ -468,16 +468,10 @@ class MotionPlanner():
             points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
             pixel_points = self.map_position(points)    # get the point locations on our map
             rejected = np.zeros(N_points - N_accepted)   # create an empty array of rejected flags
-            i = 0 
-            # Your code here!
-            
+
+            # Loop through the generated points and check if their pixel location corresponds to an obstacle in self.pixel_map                   
             for i in range(N_points - N_accepted):
                 rejected[i] = self.pixel_map[int(pixel_points[i,1]),int(pixel_points[i,0])]
-                i += 1
-            # Loop through the generated points and check if their pixel location corresponds to an obstacle in self.pixel_map
-            # self.pixel_map[px_y, px_x] = 1 when an obstacle is present
-            # Remember that indexing a 2D array is [row, column], which is [y, x]!
-            # You might have to make sure the pixel location is an integer so it can be used to index self.pixel_map
             
             new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
             new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
@@ -485,6 +479,7 @@ class MotionPlanner():
             accepted_points = np.vstack((accepted_points, new_accepted_points))
             # keep an array of generated points that are rejected (for visualisation)
             rejected_points = np.vstack((rejected_points, new_rejected_points))
+            # update the number of accepted points
             N_accepted = accepted_points.shape[0] - 1     
         
         # throw away that first 'empty' point we added for initialisation
