@@ -143,6 +143,7 @@ class MotionPlanner():
         print('Waypoints in pixel coordinates:\n', pixel_waypoints)
         
         # calculate the total path length of the waypoints
+        # !!! DOESNT CALC FROM FIRST WAYPOINT
         path_length = 0
         for i in range(1, waypoints.shape[0]):
             path_length += np.linalg.norm(waypoints[i, :] - waypoints[i - 1, :])
