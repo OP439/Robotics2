@@ -26,9 +26,6 @@ goal = np.array([8.0, 8.0])
 
 
 def deniro_odom_callback(msg):
-    '''This function extracts important information about the position, orientation, and velocity of robot
-    deniro from an incoming ROS message of type nav_msgs/Odometry and stores it in global variables that can be 
-    accessed and modified from other parts of the code.'''
     global deniro_position, deniro_heading, deniro_linear_vel, deniro_angular_vel
     deniro_position = np.array([msg.pose.pose.position.x, msg.pose.pose.position.y])
     r = R.from_quat([msg.pose.pose.orientation.x,
@@ -41,9 +38,6 @@ def deniro_odom_callback(msg):
 
 
 def set_vref_publisher():
-    '''Sets up a ROS node, creates a publisher and subscriber object, and returns the publisher object so that it can be
-    used to send velocity commands to a robot. The function also includes a time delay to ensure that the node is 
-    properly initialized before it begins executing other code. '''
     rospy.init_node("motion_planning_node")
 
     wait = True
@@ -74,14 +68,11 @@ def cmd_vel_2_twist(v_forward, omega):
 
 class MotionPlanner():
     
-    
     def __init__(self, map, scale, goal):
         self.vref_publisher = set_vref_publisher()
         self.pixel_map = map
         self.xscale, self.yscale = scale
         self.goal = goal
-        
-        self.posArray = []
     
     def send_velocity(self, vref):
         # vref is given in cartesian coordinates (v_x, v_y)
@@ -118,7 +109,6 @@ class MotionPlanner():
         return world_position
     
     def run_planner(self, planning_algorithm):
-        '''Runs the input planning algorithm and sends velocity commands to the robot '''
         rate = rospy.Rate(25)
         while not rospy.is_shutdown():
             vref, complete = planning_algorithm()
@@ -131,9 +121,9 @@ class MotionPlanner():
     def setup_waypoints(self):
         ############################################################### TASK B
         # Create an array of waypoints for the robot to navigate via to reach the goal
-        waypoints = np.array([[3, -2],
-                              [2.5, 8],
-                              [8, 8]])  # fill this in with your waypoints
+        waypoints = np.array([[0.0, 0.0],
+                              [0.0, 0.0],
+                              [0.0, 0.0]])  # fill this in with your waypoints
 
         waypoints = np.vstack([initial_position, waypoints, self.goal])
         pixel_goal = self.map_position(self.goal)
@@ -142,16 +132,6 @@ class MotionPlanner():
         print('Waypoints:\n', waypoints)
         print('Waypoints in pixel coordinates:\n', pixel_waypoints)
         
-        # calculate the total path length of the waypoints
-        path_length = 0
-        for i in range(1, waypoints.shape[0]):
-            path_length += np.linalg.norm(waypoints[i, :] - waypoints[i - 1, :])
-            #round path length to 2 decimal places
-            path_length = round(path_length, 2)
-        print('Total path length:\t', path_length)
-
-
-
         # Plotting
         plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
         plt.scatter(pixel_waypoints[:, 0], pixel_waypoints[:, 1])
@@ -160,9 +140,6 @@ class MotionPlanner():
         
         self.waypoints = waypoints
         self.waypoint_index = 0
-        
-
-
     
     def waypoint_navigation(self):
         complete = False
@@ -190,102 +167,9 @@ class MotionPlanner():
         return vref, complete
 
     def potential_field(self):
-        # COMMENT OUT WHICHEVER PART YOU WANT TO IGNORE
-        ############################################################### TASK C Part i below
-#         complete = False
-        
-#         # compute the positive force attracting the robot towards the goal
-#         # vector to goal position from DE NIRO
-#         goal_vector = goal - deniro_position
-#         # distance to goal position from DE NIRO
-#         distance_to_goal = np.linalg.norm(goal_vector)
-#         # unit vector in direction of goal from DE NIRO
-#         pos_force_direction = goal_vector / distance_to_goal
-        
-#         # potential function
-#         pos_force_magnitude = 1  #/distance_to_goal #Part i asks for a constatn     # your code here!
-#         # tuning parameter
-#         K_att = 1 # I achieved best results with 1 here     # tune this parameter to achieve    desired results
-        
-#         # positive force
-#         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
-        
-#         # compute the negative force repelling the robot away from the obstacles
-#         obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
-#         # coordinates of every obstacle pixel
-#         obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
-#         # coordinates of every obstacle pixel converted to world coordinates
-#         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
-        
-#         # vector to each obstacle from DE NIRO
-#         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
-
-#         # distance to obstacle from DE NIRO
-#         distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
-#         # unit vector in direction of obstacle from DE NIRO
-#         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
-
-#         # potential function
-#         force_magnitude = -1/distance_to_obstacle #we are asked to give equation 2 from the doc so there is no higher power   # your code here!
-#         # tuning parameter
-#         K_rep = 15.5  # I achieved best results with this value here     # tune this parameter to achieve desired results
-        
-#         # force from an individual obstacle pixel
-#         obstacle_force = force_direction * force_magnitude 
-#         # total negative force on DE NIRO
-#         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
-        ############################################################### TASK C Part i above
-    
-        ############################################################### TASK C Part ii v1 below
-#         complete = False
-        
-#         # compute the positive force attracting the robot towards the goal
-#         # vector to goal position from DE NIRO
-#         goal_vector = goal - deniro_position
-#         # distance to goal position from DE NIRO
-#         distance_to_goal = np.linalg.norm(goal_vector)
-#         # unit vector in direction of goal from DE NIRO
-#         pos_force_direction = goal_vector / distance_to_goal
-        
-#         # potential function
-#         pos_force_magnitude = 1/distance_to_goal     # your code here!
-#         # tuning parameter
-#         K_att = 100050     # tune this parameter to achieve    desired results
-        
-#         # positive force
-#         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
-        
-#         # compute the negative force repelling the robot away from the obstacles
-#         obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
-#         # coordinates of every obstacle pixel
-#         obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
-#         # coordinates of every obstacle pixel converted to world coordinates
-#         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
-        
-#         # vector to each obstacle from DE NIRO
-#         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
-
-#         # distance to obstacle from DE NIRO
-#         distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
-#         # unit vector in direction of obstacle from DE NIRO
-#         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
-
-#         # potential function
-#         force_magnitude = -1/distance_to_obstacle**4   # your code here!
-#         # tuning parameter
-#         K_rep = 140000     # tune this parameter to achieve desired results
-        
-#         # force from an individual obstacle pixel
-#         obstacle_force = force_direction * force_magnitude 
-#         # total negative force on DE NIRO
-#         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
-        ############################################################### TASK C Part ii v1 above
-        
-        
-        ############################################################### TASK C Part ii v2 below
+        ############################################################### TASK C
         complete = False
         
-        ########## POSITIVE FORCE 1 - only y force, does not depend on deniro distance to goal
         # compute the positive force attracting the robot towards the goal
         # vector to goal position from DE NIRO
         goal_vector = goal - deniro_position
@@ -293,40 +177,14 @@ class MotionPlanner():
         distance_to_goal = np.linalg.norm(goal_vector)
         # unit vector in direction of goal from DE NIRO
         pos_force_direction = goal_vector / distance_to_goal
-        #keep only the y component of this force (set the x component of the force to 0)
-        pos_force_direction[0]=0
         
         # potential function
-        pos_force_magnitude = 1   #coonstant force towards goal as it is far away  # your code here!
+        pos_force_magnitude = 0.0     # your code here!
         # tuning parameter
-        K_att = 5     # tune this parameter to achieve    desired results
+        K_att = 1.0     # tune this parameter to achieve desired results
         
         # positive force
         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
-        
-        
-        
-        
-        ########## POSITIVE FORCE 2 - both for x and y, depends on deniro distance to goal
-        # compute the positive force attracting the robot towards the goal
-        # vector to goal position from DE NIRO
-        goal_vector = goal - deniro_position
-        # distance to goal position from DE NIRO
-        distance_to_goal = np.linalg.norm(goal_vector)
-        # unit vector in direction of goal from DE NIRO
-        pos_force_direction = goal_vector / distance_to_goal
-        
-        # potential function
-        # relate this force to deniro distance from goal, make it have a wider effect by dividing distance by 2
-        pos_force_magnitude = 1/(distance_to_goal/2)#**2  
-        # tuning parameter
-        K_att = 20     # tune this parameter to achieve    desired results
-        
-        # positive force, add it to the previous force
-        positive_force += K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
-        
-        
-        
         
         # compute the negative force repelling the robot away from the obstacles
         obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
@@ -334,128 +192,44 @@ class MotionPlanner():
         obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
         # coordinates of every obstacle pixel converted to world coordinates
         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
-  
-
-
-        ######### NEGATIVE FORCE 1 - obstacles repel deniro at very close range
+        
         # vector to each obstacle from DE NIRO
         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
-
         # distance to obstacle from DE NIRO
         distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
         # unit vector in direction of obstacle from DE NIRO
         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
-
+        
         # potential function
-        # force is huge when deniro is very close to obstacle but decays rapidly as he is further
-        # multiplying distance_to_obstacles by 1.5 to require a closer distance for the exponent to kick in
-        force_magnitude = -1/(distance_to_obstacle*1.5)**8   # your code here!
+        force_magnitude = 0.0   # your code here!
         # tuning parameter
-        K_rep = 15.5     # tune this parameter to achieve desired results
+        K_rep = 100     # tune this parameter to achieve desired results
         
         # force from an individual obstacle pixel
-        obstacle_force = force_direction * force_magnitude 
+        obstacle_force = force_direction * force_magnitude
         # total negative force on DE NIRO
         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
         
         
-        
-        ########### NEGATIVE FORCE 2 - objects move deniro towards x coordinate of goal when he is perpendicular to the force
-        # vector from each obstacle pixel to goal 
-        goal_vector = obstacle_positions - goal
-        # distance from each obstacle pixel to goal 
-        distance_to_goal = np.linalg.norm(goal_vector)
-        # unit vector in direction of goal from each obstacle pixel
-        pos_force_direction = goal_vector / distance_to_goal
-        # set the y components of the force direction from obstacle pixels to goal to 0 (force will only move deniro towards x value of goal)
-        pos_force_direction[:,1]=0
-        
-        #vector from each obstacle pixel to deniro
-        obstacle_vector = obstacle_positions - deniro_position
-
-        # distance to obstacle from DE NIRO
-        distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
-        # unit vector in direction of obstacle from DE NIRO
-        force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
-        
-        # potential function
-        deniro_obstacle_vector = obstacle_positions - deniro_position
-        distance_to_obstacle_deniro = np.linalg.norm(deniro_obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
-        
-        # take x component of the force between deniro and each obstacle pixel (essentially dot product of each row with [1,0])
-        # both are unit vectors so no need to divide by the size of the vector
-        force_direction_x = np.matmul(force_direction, np.array([1,0]))
-        
-        # cos(theta) = force_direction_x[index]  cos(85deg)=0.1 cos(95deg)=-0.1
-        anglegt85 = (force_direction_x < 0.1).astype(int)
-        anglelt95 = (force_direction_x > -0.1).astype(int) # 1 for true, 0 for false but as integers
-        # multiply both together to see which values satisfy both conditions (numpy needed it done this way)
-        angles_between = anglegt85*anglelt95
-        
-        # again make sure that the force only takes effect when deniro is close
-        # force acts earlier than NEGATIVE FORCE 1 as we are only multiplying distance to obstacles by 1
-        # distance at which it starts acting can be tuned
-        force_magnitude = -1/(distance_to_obstacle_deniro*1)**8   # your code here!
-        # tuning parameter
-        K_rep = 20000     # tune this parameter to achieve desired results
-        
-        # multiply each row of the pos_force_direction (force towards x value of goal) by vector of scalars of 0 or 1
-        # ignores forces towards the x value of the goal that are caused by obstacle pixels where...
-        # deniro is not below the obstacle in the y coordinate
-        obstacle_force = pos_force_direction*angles_between[:,np.newaxis] * force_magnitude #*keep_or_remove[:,np.newaxis]
-        
-        # add these negative forces together
-        negative_force += K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
-        
-        ############################################################### TASK C Part ii v2 above
-
-        print("deniro_position:", deniro_position)
-        self.posArray.append(deniro_position)
-        
         # Uncomment these lines to visualise the repulsive force from each obstacle pixel
         # Make sure to comment it out again when you run the motion planner fully
-        #plotskip = 100   # only plots every 10 pixels (looks cleaner on the plot)
-        #plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-        #plt.quiver(obstacle_pixel_coordinates[::plotskip, 0], obstacle_pixel_coordinates[::plotskip, 1], obstacle_force[::plotskip, 0] * self.xscale, obstacle_force[::plotskip, 1] * self.yscale)
-        #plt.show()
-
+#        plotskip = 10   # only plots every 10 pixels (looks cleaner on the plot)
+#        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
+#        plt.quiver(obstacle_pixel_coordinates[::plotskip, 0], obstacle_pixel_coordinates[::plotskip, 1],
+#                   obstacle_force[::plotskip, 0] * self.xscale, obstacle_force[::plotskip, 1] * self.yscale)
+#        plt.show()
 
         print("positive_force:", positive_force)
         print("negative_force:", negative_force)
         
         # Reference velocity is the resultant force
         vref = positive_force + negative_force
-
-
+        
         # If the goal has been reached, stop
-        print("distance_to_goal:", distance_to_goal)
-        if distance_to_goal < 0.20:
+        if distance_to_goal < 0.05:
             vref = np.array([0, 0])
             complete = True
-            self.draw_path()
         return vref, complete
-    
-    #function that draws the path that the robot takes using posArray
-    def draw_path(self):
-        # get the position coordinates from the posArray
-        posArray = np.array(self.posArray)
-        # convert the position coordinates to map pixel coordinates
-        pixel_posArray = self.map_position(posArray)
-
-        # calculate the distance travelled by the robot in metres
-        distance = 0
-        for i in range(1, len(posArray)):
-            distance += np.linalg.norm(posArray[i] - posArray[i-1])
-        print("distance travelled:", distance, "m")
-
-        # plot the path
-        plt.imshow(self.pixel_map, vmin=0, vmax=1, origin='lower')
-        plt.scatter(pixel_posArray[:, 0], pixel_posArray[:, 1])
-        plt.show()
-
-
-
-
     
     def generate_random_points(self, N_points):
         ############################################################### TASK D
@@ -468,22 +242,19 @@ class MotionPlanner():
             points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
             pixel_points = self.map_position(points)    # get the point locations on our map
             rejected = np.zeros(N_points - N_accepted)   # create an empty array of rejected flags
-
+            
+            # Your code here!
             # Loop through the generated points and check if their pixel location corresponds to an obstacle in self.pixel_map
             # self.pixel_map[px_y, px_x] = 1 when an obstacle is present
             # Remember that indexing a 2D array is [row, column], which is [y, x]!
             # You might have to make sure the pixel location is an integer so it can be used to index self.pixel_map
-                    
-            for i in range(N_points - N_accepted):
-                rejected[i] = self.pixel_map[int(pixel_points[i,1]),int(pixel_points[i,0])]
-            
+                
             new_accepted_points = pixel_points[np.argwhere(rejected == 0)].reshape((-1, 2))
             new_rejected_points = pixel_points[np.argwhere(rejected == 1)].reshape((-1, 2))
             # keep an array of generated points that are accepted
             accepted_points = np.vstack((accepted_points, new_accepted_points))
             # keep an array of generated points that are rejected (for visualisation)
             rejected_points = np.vstack((rejected_points, new_rejected_points))
-            # update the number of accepted points
             N_accepted = accepted_points.shape[0] - 1     
         
         # throw away that first 'empty' point we added for initialisation
@@ -511,8 +282,8 @@ class MotionPlanner():
     def create_graph(self, points):
         ############################################################### TASK E i
         # Choose your minimum and maximum distances to produce a suitable graph
-        mindist = 2.5
-        maxdist = 5.5
+        mindist = 0.0
+        maxdist = 20.0
         
         # Calculate a distance matrix between every node to every other node
         distances = cdist(points, points)
@@ -570,11 +341,11 @@ class MotionPlanner():
     def check_collisions(self, pointA, pointB):
         ############################################################### TASK E ii     
         # Calculate the distance between the two point
-        distance = ((pointA[1] - pointB[1])**2 + (pointA[0] - pointB[0])**2)**0.5
+        distance = 0.5
         # Calculate the UNIT direction vector pointing from pointA to pointB
-        direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
+        direction = np.array([1.0, 0.0])
         # Choose a resolution for collision checking
-        resolution = 0.1   # resolution to check collision to in m
+        resolution = 5.0   # resolution to check collision to in m
         
         # Create an array of points to check collisions at
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
@@ -583,7 +354,6 @@ class MotionPlanner():
         
         for pixel in edge_pixels:   # loop through each pixel between pointA and pointB
             collision = self.pixel_map[int(pixel[1]), int(pixel[0])]    # if the pixel collides with an obstacle, the value of the pixel map is 1
-            
             if collision == 1:
                 return True     # if there's a collision, immediately return True
         return False    # if it's got through every pixel as hasn't returned yet, return False
@@ -595,7 +365,7 @@ class MotionPlanner():
         
         # Create a dataframe of unvisited nodes
         # Initialise each cost to a very high number
-        initial_cost = 1000000000000000000000000.0  # Set this to a suitable value
+        initial_cost = 5.0  # Set this to a suitable value
         
         unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
         unvisited.set_index('Node', inplace=True)
@@ -622,7 +392,6 @@ class MotionPlanner():
             
             # Go to the node that is the minimum distance from the starting node
             current_node = unvisited[unvisited['Cost']==unvisited['Cost'].min()]
-            print(current_node)
             current_node_name = current_node.index.values[0]    # the node's name (string)
             current_cost = current_node['Cost'].values[0]       # the distance from the starting node to this node (float)
             current_tree = current_node['Previous'].values[0]   # a list of the nodes visited on the way to this one (string)
@@ -637,7 +406,7 @@ class MotionPlanner():
                 if next_node_name not in visited.index.values:  # if we haven't visited this node before
                     
                     # update this to calculate the cost of going from the initial node to the next node via the current node
-                    next_cost_trial = current_cost + edge_cost  # set this to calculate the cost of going from the initial node to the next node via the current node
+                    next_cost_trial = 1234  # set this to calculate the cost of going from the initial node to the next node via the current node
                     next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
                     
                     # if it costs less to go the next node from the current node, update then next node's cost and the path to get there
