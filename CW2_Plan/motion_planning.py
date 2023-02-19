@@ -203,36 +203,41 @@ class MotionPlanner():
 #         pos_force_direction = goal_vector / distance_to_goal
         
 #         # potential function
-#         pos_force_magnitude = 1  #/distance_to_goal #Part i asks for a constatn     # your code here!
-#         # tuning parameter
+#         pos_force_magnitude = 1  #Part i asks for the attraction to the goal to be constant hence value of 1
+#         # tuning parameter - done manually
 #         K_att = 1 # I achieved best results with 1 here     # tune this parameter to achieve    desired results
         
-#         # positive force
+#         # positive force, pos_force_direction is unit vector in direction of goal from DE NIRO
 #         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
         
 #         # compute the negative force repelling the robot away from the obstacles
+#         # if self.pixel_map == 1 that means there is an obstacle as with DENIRO inflation
 #         obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
-#         # coordinates of every obstacle pixel
+#         # coordinates of every obstacle pixel, switching the columns around here
 #         obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
-#         # coordinates of every obstacle pixel converted to world coordinates
+#         # coordinates of every obstacle pixel converted to world coordinates, convert pixel coords to world coords
 #         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
         
-#         # vector to each obstacle from DE NIRO
+#         # vector to each obstacle pixel from DE NIRO, about 48000 obstacle pixel each with x and y coords
+#         # (48000, 2) array, each row represents x and y component of vector from deniro to obstacle pixel
 #         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
 
-#         # distance to obstacle from DE NIRO
+#         # distance to obstacle from DE NIRO, for each pixel, |x| = sqrt(x^2+y^2)
+#         # .reshape(-1,1) returns array with one column and however many rows
 #         distance_to_obstacle = np.linalg.norm(obstacle_vector, axis=1).reshape((-1, 1))  # magnitude of vector
-#         # unit vector in direction of obstacle from DE NIRO
+#         # unit vector in direction of obstacle from DE NIRO, for each pixel
 #         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
 
-#         # potential function
-#         force_magnitude = -1/distance_to_obstacle #we are asked to give equation 2 from the doc so there is no higher power   # your code here!
-#         # tuning parameter
-#         K_rep = 15.5  # I achieved best results with this value here     # tune this parameter to achieve desired results
+#         # potential function, distance_to_obstacle is again to each obstacle pixel
+#         force_magnitude = -1/distance_to_obstacle #we are asked to give equation 2 from the doc so inversely proportional
+#         # tuning parameter - manual process
+#         K_rep = 15.5  # I achieved best results with this value here
         
-#         # force from an individual obstacle pixel
+#         # force from each individual obstacle pixel
 #         obstacle_force = force_direction * force_magnitude 
-#         # total negative force on DE NIRO
+#         # total negative force on DE NIRO, summing the effect of each obstacle pixel on deniro
+#         # np.sum term corresponds to the sum in related Equation
+#         # .shape[0] returns the number of rows in the array which corresponds to N in Equation (here number of obstacle pixels)
 #         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
         ############################################################### TASK C Part i above
     
