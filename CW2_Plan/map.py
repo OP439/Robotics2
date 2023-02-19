@@ -73,7 +73,7 @@ def expand_map(img, robot_width):
     radius=robot_px/2
     A = np.arange(-radius,radius+1)**2
     dists = np.sqrt(A[:,None] + A)
-    robot_mask = (np.abs(dists<=radius)).astype(int)
+    robot_mask = (np.abs(dists<=radius+0.5)).astype(int)
     
     expanded_img = binary_dilation(img, robot_mask)
     
