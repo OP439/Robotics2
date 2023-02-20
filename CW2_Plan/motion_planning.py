@@ -474,7 +474,10 @@ class MotionPlanner():
         
         while N_accepted < N_points:    # keep generating points until N_points have been accepted
         
-            points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))  # generate random coordinates
+            # generate random coordinates using a uniform distribution between -10 and 10
+            # points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))
+            # generate random coordinates using a normal distribution between -10 and 10
+            points = np.random.normal(0, 10, (N_points - N_accepted, 2))
             pixel_points = self.map_position(points)    # get the point locations on our map
             rejected = np.zeros(N_points - N_accepted)   # create an empty array of rejected flags
 
