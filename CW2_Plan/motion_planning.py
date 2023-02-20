@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 import rospy
 import sys
+import atexit
 
 deniro_position = np.array([0, -6.0])
 deniro_heading = 0.0
@@ -82,6 +83,7 @@ class MotionPlanner():
         self.goal = goal
         
         self.posArray = []
+        atexit.register(self.draw_path)
     
     def send_velocity(self, vref):
         # vref is given in cartesian coordinates (v_x, v_y)
