@@ -476,8 +476,10 @@ class MotionPlanner():
         
             # generate random coordinates using a uniform distribution between -10 and 10
             # points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))
-            # generate random coordinates using a normal distribution between -10 and 10
-            points = np.random.normal(0, 10, (N_points - N_accepted, 2))
+            # generate random coordinates using a normal distribution between -10 and 10 witha  mean of
+            # and std of 3 meaing that there is a less than 0.1% chance of a value being generated 
+            # outside of our range 68% should lie between 6 and -6
+            #points = np.random.normal(0, 3, (N_points - N_accepted, 2))
             pixel_points = self.map_position(points)    # get the point locations on our map
             rejected = np.zeros(N_points - N_accepted)   # create an empty array of rejected flags
 
