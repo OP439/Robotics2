@@ -53,28 +53,94 @@ def generate_map():
     
 
 def expand_map(img, robot_width):
-    robot_px = int(robot_width * scale)   # size of the robot in pixels x axis
+    # We are passed robot_width as DENIRO_width which is set to 1m
+    # 1m is 16 px wide so we have to convert from metres to pixels
+    # This means that one pixel is 0.0625m wide
+    # We are creating a pixel mask for deniro
+    # The expanding of the map based on this mask is a technique called dilation
+    robot_px = int(robot_width * scale)   # size of the robot in pixels x axis, returns 16 here
     
     ############################################################### TASK A
     # SQUARE MASK
-    # create a square array of ones of the size of the robot
+    # create a square array of ones of the size of the robot in pixels
     robot_mask = np.ones((robot_px, robot_px))
+    #Below is the matrix that this returns. 
+#     [[1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
+#      [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]]
     
     # CIRCULAR MASK - optional for individual students
     # create a square array of the size of the robot
     # where a circle the size of the robot is filled with ones
-    #### OLD VERSION - Not filled in in the middle
-    #radius=robot_px/2
-    #A = np.arange(-radius,radius+1)**2
-    #dists = np.sqrt(A[:,None] + A)
-    #robot_mask = (np.abs(dists-radius)<0.5).astype(int)
     
     ##### NEW VERSION - filled in in the middle
+    # radius of the robot is 8 pixels (16/2)
     radius=robot_px/2
-    A = np.arange(-radius,radius+1)**2
-    dists = np.sqrt(A[:,None] + A)
-    robot_mask = (np.abs(dists<=radius+0.5)).astype(int)
     
+    # Create an array of ints from -8 to 8 and square them
+    # Needed for comparison in the next step
+    A = np.arange(-radius,radius+1)**2
+    # [64 49 36 25 16  9  4  1  0  1  4  9 16 25 36 49 64]
+    
+    # A[:,None] turns the above array into a column vector instead, is equivalent to doing .reshape(-1,1) here
+    # A[:,None] + A is then a 16x16 matrix where we add every element of the row vector to a row of the column vector
+    # The above step returns below where top left element is 64+64 and below that is 49+64 and so on
+#     [[128 113 100  89  80  73  68  65  64  65  68  73  80  89 100 113 128]
+#      [113  98  85  74  65  58  53  50  49  50  53  58  65  74  85  98 113]
+#      [100  85  72  61  52  45  40  37  36  37  40  45  52  61  72  85 100]
+#      [ 89  74  61  50  41  34  29  26  25  26  29  34  41  50  61  74  89]
+#      [ 80  65  52  41  32  25  20  17  16  17  20  25  32  41  52  65  80]
+#      [ 73  58  45  34  25  18  13  10   9  10  13  18  25  34  45  58  73]
+#      [ 68  53  40  29  20  13   8   5   4   5   8  13  20  29  40  53  68]
+#      [ 65  50  37  26  17  10   5   2   1   2   5  10  17  26  37  50  65]
+#      [ 64  49  36  25  16   9   4   1   0   1   4   9  16  25  36  49  64]
+#      [ 65  50  37  26  17  10   5   2   1   2   5  10  17  26  37  50  65]
+#      [ 68  53  40  29  20  13   8   5   4   5   8  13  20  29  40  53  68]
+#      [ 73  58  45  34  25  18  13  10   9  10  13  18  25  34  45  58  73]
+#      [ 80  65  52  41  32  25  20  17  16  17  20  25  32  41  52  65  80]
+#      [ 89  74  61  50  41  34  29  26  25  26  29  34  41  50  61  74  89]
+#      [100  85  72  61  52  45  40  37  36  37  40  45  52  61  72  85 100]
+#      [113  98  85  74  65  58  53  50  49  50  53  58  65  74  85  98 113]
+#      [128 113 100  89  80  73  68  65  64  65  68  73  80  89 100 113 128]]
+    # We then take the square root of each of the values in the above array
+    dists = np.sqrt(A[:,None] + A)
+    
+    # We then do a comparison of the results from the previous step with our maximum distance which is 8
+    # This is a boolean comparison so we return 1 if our condition is true and 0 if the condition is false
+    # We add 0.5 to the radius because deniro is not a straight line so needs some turning space
+    robot_mask = (np.abs(dists<=radius+0.5)).astype(int)
+#     [[0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0]
+#      [0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0]
+#      [0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]
+#      [0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]
+#      [0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0]
+#      [0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0]
+#      [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+#      [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+#      [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+#      [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+#      [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+#      [0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0]
+#      [0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0]
+#      [0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]
+#      [0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]
+#      [0 0 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0]
+#      [0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0]]
+    
+    # this is where we do the dilation - we imported this function
     expanded_img = binary_dilation(img, robot_mask)
     
     return expanded_img
