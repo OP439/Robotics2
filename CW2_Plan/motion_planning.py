@@ -475,7 +475,7 @@ class MotionPlanner():
         while N_accepted < N_points:    # keep generating points until N_points have been accepted
         
             # generate random coordinates using a uniform distribution between -10 and 10
-            # points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))
+            points = np.random.uniform(-10, 10, (N_points - N_accepted, 2))
             # generate random coordinates using a normal distribution between -10 and 10 witha  mean of
             # and std of 3 meaing that there is a less than 0.1% chance of a value being generated 
             # outside of our range 68% should lie between 6 and -6
