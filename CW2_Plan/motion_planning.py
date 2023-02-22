@@ -650,9 +650,9 @@ class MotionPlanner():
                 next_node_name = str(next_node_name)    # the next node's name (string)
                 
                 if next_node_name not in visited.index.values:  # if we haven't visited this node before
-                    
-                    # update this to calculate the cost of going from the initial node to the next node via the current node
-                    next_cost_trial = current_cost + edge_cost  # set this to calculate the cost of going from the initial node to the next node via the current node
+                    ############################################################### Section 5.3.1
+                    # calculates the cost of going from the initial node to the next node via the current node
+                    next_cost_trial = current_cost + edge_cost 
                     next_cost = unvisited.loc[[next_node_name], ['Cost']].values[0] # the previous best cost we've seen going to the next node
                     
                     # if it costs less to go the next node from the current node, update then next node's cost and the path to get there
