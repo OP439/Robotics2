@@ -600,12 +600,15 @@ class MotionPlanner():
     def check_collisions(self, pointA, pointB):
         ############################################################### Section 5.2.2    
         # Calculate the distance between the two points
+        # using code based of the equaiton 3
         #pointA[0] = Ax, pointA[1] = Ay pointB[0] = Bx pointB[1] = By
         distance = ((pointA[0] - pointB[0])**2 + (pointA[1] - pointB[1])**2)**0.5
-        # Calculate the UNIT direction vector pointing from pointA to pointB
+        # Calculate the UNIT direction vector pointing from pointA to pointB7
+        # using code based of the equaiton 4 and figure 25
         direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
-        # Choose a resolution for collision checking
-        resolution = 0.03   # resolution to check collision to in m
+        # resolution set to less than half the width of a pixel 
+        # for reasons described under resolution in section 5.2.2
+        resolution = 0.03   
         
         # Create an array of points to check collisions at
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
@@ -625,8 +628,9 @@ class MotionPlanner():
         
         # Create a dataframe of unvisited nodes
         ############################################################### Section 5.3.1
-        # Initialise each cost to a very high number
-        initial_cost = 1000000000000000000000000.0  # Set this to a suitable value
+        # Initialise each cost to a very high number becuase of reasons 
+        #explained in 5.3.1
+        initial_cost = 1000000000000000000000000.0  
         
         unvisited = pd.DataFrame({'Node': nodes, 'Cost': [initial_cost for node in nodes], 'Previous': ['' for node in nodes]})
         unvisited.set_index('Node', inplace=True)
