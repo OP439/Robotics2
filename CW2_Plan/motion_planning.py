@@ -589,7 +589,7 @@ class MotionPlanner():
         # Calculate the UNIT direction vector pointing from pointA to pointB
         direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
         # Choose a resolution for collision checking
-        resolution = 0.1   # resolution to check collision to in m
+        resolution = 0.03   # resolution to check collision to in m
         
         # Create an array of points to check collisions at
         edge_points = pointA.reshape((1, 2)) + np.arange(0, distance, resolution).reshape((-1, 1)) * direction.reshape((1, 2))
