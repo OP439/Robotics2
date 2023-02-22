@@ -1,3 +1,6 @@
+############# PLEASE NOTE YOU MAY GET INDENT ERRORS DEPENDING ON WHAT PLUGINS YOU USE
+############# TO COMMENT AND UNCOMMENT CODE BLOCKS
+
 from math import cos, sin, acos, asin, atan2, sqrt, pi
 from numpy import genfromtxt
 from scipy.spatial.transform import Rotation as R
@@ -196,6 +199,7 @@ class MotionPlanner():
     def potential_field(self):
         # COMMENT OUT WHICHEVER PART YOU WANT TO IGNORE
         ############################################################### TASK C Part i below
+        ## See report section 4.1 for for this information 
 #         complete = False
         
 #         # compute the positive force attracting the robot towards the goal
@@ -212,14 +216,18 @@ class MotionPlanner():
 #         K_att = 1 # I achieved best results with 1 here     # tune this parameter to achieve    desired results
         
 #         # positive force, pos_force_direction is unit vector in direction of goal from DE NIRO
+#         ## The mathematical representation of this force can be seen in report section 4.1
+#         ## This is the most basic possible representation
 #         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
         
 #         # compute the negative force repelling the robot away from the obstacles
 #         # if self.pixel_map == 1 that means there is an obstacle as with DENIRO inflation
+#         # each one of these is an "i" component that is summed in report section 4.1
 #         obstacle_pixel_locations = np.argwhere(self.pixel_map == 1)
 #         # coordinates of every obstacle pixel, switching the columns around here
 #         obstacle_pixel_coordinates = np.array([obstacle_pixel_locations[:, 1], obstacle_pixel_locations[:, 0]]).T
 #         # coordinates of every obstacle pixel converted to world coordinates, convert pixel coords to world coords
+#         # see report section 3.1.1 for more information on where the goal, obstacles and origin are and why they are converted.
 #         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
         
 #         # vector to each obstacle pixel from DE NIRO, about 48000 obstacle pixel each with x and y coords
@@ -234,14 +242,14 @@ class MotionPlanner():
 
 #         # potential function, distance_to_obstacle is again to each obstacle pixel
 #         force_magnitude = -1/distance_to_obstacle #we are asked to give equation 2 from the doc so inversely proportional
-#         # tuning parameter - manual process
+#         # tuning parameter - manual process, see report section 4.1 for the effect of different values. 
 #         K_rep = 15.5  # I achieved best results with this value here
         
 #         # force from each individual obstacle pixel
 #         obstacle_force = force_direction * force_magnitude 
 #         # total negative force on DE NIRO, summing the effect of each obstacle pixel on deniro
 #         # np.sum term corresponds to the sum in related Equation
-#         # .shape[0] returns the number of rows in the array which corresponds to N in Equation (here number of obstacle pixels)
+#         # .shape[0] returns the number of rows in the array which corresponds to N in section 4.1 of the report(here number of obstacle pixels)
 #         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
         ############################################################### TASK C Part i above
     
@@ -257,9 +265,10 @@ class MotionPlanner():
 #         pos_force_direction = goal_vector / distance_to_goal
         
 #         # potential function
+#         # this is what has changed since section 4.1 of the report, we are now relating the distance to the goal to the force.
 #         pos_force_magnitude = 1/distance_to_goal     # your code here!
-#         # tuning parameter
-#         K_att = 100050     # tune this parameter to achieve    desired results
+#         # tuning parameter - below value was found to reach goal, see report section 4.2 for effect of different values
+#         K_att = 100050     # tune this parameter to achieve desired results 
         
 #         # positive force
 #         positive_force = K_att * pos_force_direction * pos_force_magnitude  # normalised positive force
@@ -272,6 +281,9 @@ class MotionPlanner():
 #         obstacle_positions = self.world_position(obstacle_pixel_coordinates)
         
 #         # vector to each obstacle from DE NIRO
+#         # report section 4.1 has a nice graphical representation of this process
+#         # it is more complex than it looks here as the subtraction is happening for every single pixel
+#         # this is numpy making the code look simpler
 #         obstacle_vector = obstacle_positions - deniro_position   # vector from DE NIRO to obstacle
 
 #         # distance to obstacle from DE NIRO
@@ -280,13 +292,17 @@ class MotionPlanner():
 #         force_direction = obstacle_vector / distance_to_obstacle   # normalised vector (for direction)
 
 #         # potential function
+#         # the high exponent here means that the force will be small until the robot is less than 1m from the obstacle
+#         # see report section 4.2 for information about the physical real world meaning of this and to see graphs of the effect
 #         force_magnitude = -1/distance_to_obstacle**4   # your code here!
-#         # tuning parameter
+#         # tuning parameter - reaches goal with this value. See report section 4.2 for effect of different values
 #         K_rep = 140000     # tune this parameter to achieve desired results
         
 #         # force from an individual obstacle pixel
 #         obstacle_force = force_direction * force_magnitude 
 #         # total negative force on DE NIRO
+#         # this end equation is the same as in section 4.1 in the report
+#         # summing all the forces and dividing by the number of obstacles (obstacle pixels here)
 #         negative_force = K_rep * np.sum(obstacle_force, axis=0) / obstacle_pixel_locations.shape[0]
         ############################################################### TASK C Part ii v1 above
         
