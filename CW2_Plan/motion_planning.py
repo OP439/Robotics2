@@ -519,9 +519,13 @@ class MotionPlanner():
         return world_points
     
     def create_graph(self, points):
-        ############################################################### TASK E i
-        # Choose your minimum and maximum distances to produce a suitable graph
-        mindist = 2.5
+        ############################################################### section 5.2.1
+        # tempory min max values selected from section 5.2.1
+        #mindist = 2
+        #maxdist = 5
+        ############################################################### section 5.3.1
+        # final min max values selected from section 5.3.1
+        mindist = 1.75
         maxdist = 5.5
         
         # Calculate a distance matrix between every node to every other node
@@ -578,9 +582,10 @@ class MotionPlanner():
         return graph, distances_graph
     
     def check_collisions(self, pointA, pointB):
-        ############################################################### TASK E ii     
-        # Calculate the distance between the two point
-        distance = ((pointA[1] - pointB[1])**2 + (pointA[0] - pointB[0])**2)**0.5
+        ############################################################### Section 5.2.2    
+        # Calculate the distance between the two points
+        #pointA[0] = Ax, pointA[1] = Ay pointB[0] = Bx pointB[1] = By
+        distance = ((pointA[0] - pointB[0])**2 + (pointA[1] - pointB[1])**2)**0.5
         # Calculate the UNIT direction vector pointing from pointA to pointB
         direction = np.array([-(pointA[0] - pointB[0])/distance, -(pointA[1] - pointB[1])/distance])
         # Choose a resolution for collision checking
@@ -599,11 +604,11 @@ class MotionPlanner():
         return False    # if it's got through every pixel as hasn't returned yet, return False
     
     def dijkstra(self, graph, edges):
-        ############################################################### TASK F
         goal_node = goal
         nodes = list(graph.keys())
         
         # Create a dataframe of unvisited nodes
+        ############################################################### Section 5.3.1
         # Initialise each cost to a very high number
         initial_cost = 1000000000000000000000000.0  # Set this to a suitable value
         
