@@ -252,13 +252,13 @@ class VelocityController(b_pykdl.baxter_kinematics):
         ############################
         # Task E:
         # Fill in the function to compute elbow Jacobian. Inputs are the joint values in KDL and the jacobian matrix
-        self._jac_kdl_link.JntToJac([], [])
+        self._jac_kdl_link.JntToJac(q_kdl, jacobian)
 
         J_link = self.kdl_to_mat(jacobian) # convert the jacobian from PyKDL format to numpy array
         
         # after computing the jacobian for the elbow, we need to convert it to a full size jacobian 
         J = np.zeros((6, nj_tot)) # Total Jacobain matrix. Fill in with J_link of elbow
-        J = []
+        J = np.concatenate((J_link, np.zeros((6, nj_tot - nj))),axis=1)
 
         return J[0:3,:] # take only linear part of the jacobian
 
@@ -288,7 +288,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         ##########################
         ##### Task D
         # compute linear and angular velocities given P_des, P, delta_angle, r, and dt
-        dP = []  # linear displacement. Note that P_des is the desired end-effector position at the next time instant.
+        dP = (P_des-P)/dt  # linear displacement. Note that P_des is the desired end-effector position at the next time instant.
         dw = np.array([0,0,0]) # angular displacement. To be edited only by groups for part ii
         
         # twist is [linear velocity, angular velocity]
@@ -297,11 +297,11 @@ class VelocityController(b_pykdl.baxter_kinematics):
         ##########################
         ##### Task E
         # compute Jacobian of the end-effector and solve velocity IK with pseudoinverse. Use self.jacobian() with joint_values as inputs
-        J_ee = self.jacobian([])    # your code here, replace [] with the correct variable
+        J_ee = self.jacobian(joint_values)    # your code here, replace [] with the correct variable
         J_ee = np.asarray(J_ee) # convert to np.array
 
-        J_pinv = DPinv([], eps=1e-10) # your code here, replace [] to compute the pseudoinverse of J_ee
-        qd = [] # your code here, replace [] with a matrix multiplication to compute joint velocities from twist
+        J_pinv = DPinv(J_ee, eps=1e-10) # your code here, replace [] to compute the pseudoinverse of J_ee
+        qd = np.matmul(J_pinv,twist) # your code here, replace [] with a matrix multiplication to compute joint velocities from twist
 
         if nullspace_en:
             ##########################
@@ -605,8 +605,8 @@ def main(task):
     ######################################################
     ## Task C:
     # fill in the desired poses
-    xyz_des_pick = []       # your code here!
-    xyz_des_circle = []     # your code here!
+    xyz_des_pick = [0.75, 0, 0.93]       # your code here!
+    xyz_des_circle = [0.75,0.1,1.23]     # your code here!
     rpy_des = [-np.pi, 0, np.pi]  # this is used only for groups. For individuals it has no effect
     if task == "go2pose":
         q = reachPose(Arm, q, xyz_des_pick, rpy_des)
