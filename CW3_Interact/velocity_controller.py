@@ -294,8 +294,13 @@ class VelocityController(b_pykdl.baxter_kinematics):
         ##### Task D
         # compute linear and angular velocities given P_des, P, delta_angle, r, and dt
         dP = (P_des-P)/dt  # linear displacement. Note that P_des is the desired end-effector position at the next time instant.
-        dw = np.array([0,0,0]) # angular displacement. To be edited only by groups for part ii
+        Pvel = dP/dt # linear velocity
+        #dw = np.array([0,0,0]) # angular displacement. To be edited only by groups for part ii
+        dw = (r*delta_angle)/dt # angular displacement
         
+
+        # dw is the angular velocity of the end-effector. It is a 3x1 vector.
+
         # twist is [linear velocity, angular velocity]
         twist = np.hstack((dP, dw))
 
@@ -547,7 +552,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         return joint_values, Pose_current
 
 
-def reachPose(Arm, q, xyz_des, rpy_des=[0,0,0]):
+def reachPose(Arm, q, xyz_des, rpy_des): #rpy_des=[0,0,0]
     """ high level function to pick up an object at pose xyz_des, rpy_des """
     # approach from 0.18 m above
     xyz_approach = [xyz_des[0], xyz_des[1], xyz_des[2] + 0.18]
@@ -614,13 +619,15 @@ def main(task):
     # fill in the desired poses
     xyz_des_pick = [0.75, 0, 0.93]       # your code here!
     xyz_des_circle = [0.75,0.1,1.23]     # your code here!
-    rpy_des = [-np.pi, 0, np.pi]  # this is used only for groups. For individuals it has no effect
+    #rpy_des = [-np.pi, 0, np.pi]  # this is used only for groups. For individuals it has no effect
+    rpy_des = [0, np.pi/2, 0]
+    print("rpy_des was above this line-----------------")
     if task == "go2pose":
         q = reachPose(Arm, q, xyz_des_pick, rpy_des)
 
     elif task == "path":
         q = reachPose(Arm, q, xyz_des_pick, rpy_des)
-        q = Circle(Arm, q, xyz_des_circl, rpy_des)
+        q = Circle(Arm, q, xyz_des_circle, rpy_des)
 
     elif task == "nullspace":
         q = reachPose(Arm, q, xyz_des_pick, rpy_des)
