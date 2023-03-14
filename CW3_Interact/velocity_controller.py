@@ -285,7 +285,18 @@ class VelocityController(b_pykdl.baxter_kinematics):
         return J[0:3,:] # take only linear part of the jacobian
 
     def ee_IK_solver(self, joint_values, P_des, quat_des, dt, nullspace_en, vel_elbow):
-        """ solves the inverse velocity kinematics of the end effector """
+        """
+        solves the inverse velocity kinematics of the end effector
+        inputs:
+            joint_values: current joint values 
+            P_des: desired position of the end effector 
+            quat_des: desired orientation of the end effector (quaternion)
+            dt: time step
+            nullspace_en: enable nullspace control
+            vel_elbow: desired velocity of the elbow
+        outputs:
+            qd: desired joint velocities
+        """
         
         nj = joint_values.shape[0]  # number of joints
         
