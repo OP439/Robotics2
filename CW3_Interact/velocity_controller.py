@@ -310,9 +310,8 @@ class VelocityController(b_pykdl.baxter_kinematics):
         ##########################
         ##### Task D
         # compute linear and angular velocities given P_des, P, delta_angle, r, and dt
-        dP = (P_des-P)/dt  # linear displacement. Note that P_des is the desired end-effector position at the next time instant.
-        Pvel = dP/dt # linear velocity
-        dw = (r*delta_angle)/dt # angular displacement
+        dP = (P_des-P)/dt  # linear velocity. Note that P_des is the desired end-effector position at the next time instant
+        dw = (r*delta_angle)/dt # angular velocity
         # twist is [linear velocity, angular velocity]
         twist = np.hstack((dP, dw))
 
