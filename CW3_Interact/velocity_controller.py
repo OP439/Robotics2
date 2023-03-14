@@ -312,12 +312,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         # compute linear and angular velocities given P_des, P, delta_angle, r, and dt
         dP = (P_des-P)/dt  # linear displacement. Note that P_des is the desired end-effector position at the next time instant.
         Pvel = dP/dt # linear velocity
-        #dw = np.array([0,0,0]) # angular displacement. To be edited only by groups for part ii
         dw = (r*delta_angle)/dt # angular displacement
-        
-
-        # dw is the angular velocity of the end-effector. It is a 3x1 vector.
-
         # twist is [linear velocity, angular velocity]
         twist = np.hstack((dP, dw))
 
@@ -654,11 +649,11 @@ def main(task):
     
     ######################################################
     ## Task C:
-    # fill in the desired poses
-    xyz_des_pick = [0.75, 0, 0.93]       # your code here!
-    xyz_des_circle = [0.75,0.1,1.23]     # your code here!
-    #rpy_des = [-np.pi, 0, np.pi]  # this is used only for groups. For individuals it has no effect
-    rpy_des = [0, np.pi/2, 0]
+    xyz_des_pick = [0.75, 0, 0.93]       # co-ord from tutorial sheet
+    xyz_des_circle = [0.75,0.1,1.23]     # co-ord from tutorial sheet
+    #rpy_des = [-np.pi, 0, np.pi]  # ZYX Euler angles to grab brick from above
+    rpy_des = [0, np.pi/2, 0]   # Grab brick from behind
+
     print("rpy_des was above this line-----------------")
     if task == "go2pose":
         q = reachPose(Arm, q, xyz_des_pick, rpy_des)
