@@ -250,7 +250,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
             q_kdl[i] = q_elbow[i]       # fill in the PyKDL joint array
 
         ############################
-        # Task E:
+        # Task E: USED ALSO IN REPORT SECTION 5 TASK G PART II 
         # Fill in the function to compute elbow Jacobian. Inputs are the joint values in KDL and the jacobian matrix
         #q_kdl is a PyKDL joint array up to the elbow, jacobian is a PyKDL Jacobian of the right size for the elbow
         #this built in method takes both of those things and calculates the correct Jacobian in-place
@@ -265,7 +265,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
 #         J = np.zeros((6, nj_tot)) #??????????Total Jacobain matrix. Fill in with J_link of elbow
 #         J = np.concatenate((J_link, np.zeros((6, nj_tot - nj))),axis=1)
         
-        # NEW VERSION
+        # NEW VERSION - SEE REPORT SECTION 5 TASK G PART II OBSTACLE AVOIDANCE
         #Owain version - should have identical output - this one has worked for me for task G ii
         #the Jacobian needs to be of size 6x7 for control as we are projecting the qd2 velocity calculated..
         #from this link into the nullspace where all joints will need to have velocity to compensate and ..
@@ -282,6 +282,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         #which correspond to the linear parts
         #vel_elbow is a 3x1 matrix so we need to have three rows 
         #this is now a 3x7 matrix
+        #THIS RESULT IS PASSED TO THE CODE 5.3 IN REPORT SECTION 5 (TASK G PART II)
         return J[0:3,:] # take only linear part of the jacobian
 
     def ee_IK_solver(self, joint_values, P_des, quat_des, dt, nullspace_en, vel_elbow):
@@ -337,20 +338,20 @@ class VelocityController(b_pykdl.baxter_kinematics):
 
         if nullspace_en:
             ##########################
-            #####Task F
+            #####Task F REPORT SECTION 4
             # Compute projector into the ee Jacobian null space and joint velocity to reach desired configuration
             # Create a square identity matrix in the shape of the number of joints in the robot (here 7x7)
             # Identity matrix multiplied by another matrix always returns that matrix
             I = np.eye(nj) #np.eye is the built in identity matrix creation method in numpy
             #Proj = []   # this is the null space projector, N. Replace [] with your calculation.
-            #Following the Equation OP2 from the report exactly - Proj is the same as N in that Equation
+            #Following the Equation 4.2 FROM REPORT SECTION 4 exactly - Proj is the same as N in that Equation
             #Returns a 7x7 matrix (the null space projector)
             #J_ee is the jacobian of the end-effector
             #J_pinv is the pseudo inverse of the jacobian of the end effector
             Proj = I-np.matmul(J_pinv,J_ee) #np.matmul is the matrix multiplication function
 
             ##########################
-            #####Task G part i
+            #####Task G part i REPORT SECTION 5 PART I
             # Compute secondary joint velocities to reach desired configuration q_desired, given the current joint values joint_values
             # and sampling time dt
             #7x1 array of desired joint angles, predetermined 
@@ -365,7 +366,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
             qd2 = 0.01 * qd2 # note that q_desired is the final joint configuration, so we artificially slow the speed down here (as if it is interpolating over a longer time period).
 
             ##########################
-            #####Task G part ii
+            #####Task G part ii REPORT SECTION 5 PART I
             #use the link_jacobian function to get a 3x7 matrix corresponding to the linear parts of the velocity
             J_elbow = self.link_jacobian(joint_values)
             
@@ -383,7 +384,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
             #Project qd2 into the nullspace - for part ii this means that all joints are now moving instead of just..
             #the first three to not affect the end effector motion
             #Then add both tasks together so that both can happend concurrently
-            #This is the same as Equation OP1
+            #This is the same as Equation 4.1 FROM REPORT SECTION 4 TASK F
             qd = qd + np.matmul(Proj, qd2)  # projection in Null space
 
         return qd
