@@ -320,7 +320,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         delta_angle, r = quat2angax(quat_err)   # angle and axis of error
 
         ##########################
-        ##### Task D
+        ##### Task D - SEE REPORT SECTION 3 TASK D
         # compute linear and angular velocities given P_des, P, delta_angle, r, and dt
         dP = (P_des-P)/dt  # linear velocity. Note that P_des is the desired end-effector position at the next time instant
         dw = (r*delta_angle)/dt # angular velocity
@@ -328,7 +328,7 @@ class VelocityController(b_pykdl.baxter_kinematics):
         twist = np.hstack((dP, dw))
 
         ##########################
-        ##### Task E
+        ##### Task E - SEE REPORT SECTION 3 TASK E
         # compute Jacobian of the end-effector and solve velocity IK with pseudoinverse. Use self.jacobian() with joint_values as inputs
         J_ee = self.jacobian(joint_values)    # your code here, replace [] with the correct variable
         J_ee = np.asarray(J_ee) # convert to np.array
@@ -659,7 +659,7 @@ def main(task):
     Arm.move_to_joint_position(q.reshape(-1), 2)
     
     ######################################################
-    ## Task C:
+    ## Task C: SEE REPORT SECTION 3 TASK 3
     xyz_des_pick = [0.75, 0, 0.93]       # co-ord from tutorial sheet
     xyz_des_circle = [0.75,0.1,1.23]     # co-ord from tutorial sheet
     #rpy_des = [-np.pi, 0, np.pi]  # ZYX Euler angles to grab brick from above
