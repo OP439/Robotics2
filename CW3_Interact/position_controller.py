@@ -216,15 +216,16 @@ def main(task):
     # Hint: Use the knowledge of 3D transformation 
     #       from lectures last term
     # ========= ========= ============= ========= =========
+    # Refer to Report Section 2.B.i
     # Example command to move the arms to a target pose with position control
     # Go to the starting Pose for left arm
     left_xyz = [0.5, 0.5, 0.25]
-    left_rpy = [0.5, 0.5, np.pi]    # Replace the roll, pitch, and yaw value with the correct value (in radians)
+    left_rpy = [0,  np.pi, 0]    # Replace the roll, pitch, and yaw value with the correct value (in radians)
     left_arm.servo_to_pose(left_xyz, left_rpy)
     
     # Go to the starting Pose for right arm
     right_xyz = [0.5, -0.5, 0.25]
-    right_rpy = [0.5, 0.5, np.pi]   # Replace the roll, pitch, and yaw value with the correct value (in radians)
+    right_rpy = [0,  np.pi, 0]    # Replace the roll, pitch, and yaw value with the correct value (in radians)
     right_arm.servo_to_pose(right_xyz, right_rpy)
 
     if task == 'initPose':
@@ -238,7 +239,7 @@ def main(task):
         # Task: Handling over brick task
         # Execute the trajectory
         # ========= ========= ============== ========= =========
-        # Your code here
+        # Refer to Report Section 2.B.ii
         #LEFT ARM - LEFT UP
         left_xyz = [0.75, 0.5, 0.1]
         left_rpy = [np.pi*4/4, 0, np.pi*4/4]
@@ -315,7 +316,7 @@ def main(task):
         #       placement
         # Execute the trajectory
         # ========= ========= =============== ========= =========
-        # Your code here!
+        # Refer to Report Section 2.B.iii
         #LEFT ARM - LEFT UP
         left_xyz = [0.75, 0.5, 0.1]
         left_rpy = [np.pi*4/4, 0, np.pi*4/4]
@@ -330,19 +331,15 @@ def main(task):
         left_xyz = [0.75, 0.5, 0.2]
         left_rpy = [np.pi*4/4, 0, np.pi*2/4]
         left_arm.servo_to_pose(left_xyz,left_rpy)
-        #LEFT ARM - CENTRE UP (ROTATED)
+        #LEFT ARM - CENTRE UP (SIDEWAYS)
         left_xyz = [0.75, 0.05, 0.3]
         left_rpy = [np.pi*4/4, np.pi*2/4,np.pi*2/4]
         left_arm.servo_to_pose(left_xyz, left_rpy)
         #RIGHT ARM - RIGHT UP
-        #right_xyz = [0.75, -0.5, 0.1]
-        #right_rpy = [np.pi*4/4, 0, np.pi*4/4]
-        #right_arm.servo_to_pose(right_xyz, right_rpy)
-        #RIGHT ARM - RIGHT UP
         right_xyz = [0.75, -0.5, 0.1]
         right_rpy = [np.pi*4/4, 0, np.pi*2/4]
         right_arm.servo_to_pose(right_xyz, right_rpy)
-        #RIGHT ARM - RIGHT UP
+        #RIGHT ARM - CENTRE UP (SIDEWAYS)
         right_xyz = [0.75, -0.05, 0.3]
         right_rpy = [np.pi*4/4, -np.pi*2/4, np.pi*2/4]
         right_arm.servo_to_pose(right_xyz, right_rpy)
@@ -352,17 +349,19 @@ def main(task):
         #LEFT ARM - RELEASE
         left_arm.gripper_close()
         left_arm.gripper_open()
-        #LEFT ARM - CENTRE UP (ROTATED)
+        #LEFT ARM - LEFT UP (SIDEWAYS)
         left_xyz = [0.75, 0.4, 0.2]
         left_rpy = [np.pi*4/4, 0,np.pi*2/4]
         left_arm.servo_to_pose(left_xyz, left_rpy)
-        #RIGHT ARM - RIGHT UP
+        #RIGHT ARM - RIGHT UP (SIDEWAYS)
         right_xyz = [0.75, -0.2, 0.4]
         right_rpy = [np.pi*4/4, 0, np.pi*2/4]
         right_arm.servo_to_pose(right_xyz, right_rpy)
+        #RIGHT ARM - RIGHT UP
         right_xyz = [0.75, -0.5, 0.25]
         right_rpy = [np.pi*4/4, 0, np.pi*4/4]
         right_arm.servo_to_pose(right_xyz, right_rpy)
+        #RIGHT ARM - RIGHT DOWN
         right_xyz = [0.75, -0.5, 0]
         right_rpy = [np.pi*4/4, 0, np.pi*4/4]
         right_arm.servo_to_pose(right_xyz, right_rpy)
