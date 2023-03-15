@@ -211,7 +211,7 @@ def main(task):
     right_arm.gripper_close()
     right_arm.gripper_open()
 
-    # ========= ========= TASK B part i ========= =========
+    # ========= ========= TASK B part i ========= ========= #SEE REPORT SECTION 2
     # Find the correct orientation for the starting pose
     # Hint: Use the knowledge of 3D transformation 
     #       from lectures last term
@@ -232,7 +232,7 @@ def main(task):
         return
 
     elif task == 'pnp1':
-        # ========= ========= TASK B part ii ========= =========
+        # ========= ========= TASK B part ii ========= ========= #SEE REPORT SECTION 2
         # Find the way points trajectory 
         # Trajectory : a sequence of robot EE pose (xyz, rpy), 
         #              including the gripper state
@@ -307,7 +307,7 @@ def main(task):
         return
 
     elif task == 'pnp2':
-        # ========= ========= TASK B part iii ========= =========
+        # ========= ========= TASK B part iii ========= ========= #SEE REPORT SECTION 2
         # ========= =========    Group Only   ========= =========
         # Find the way points trajectory 
         # Trajectory : a sequence of robot EE pose (xyz, rpy), 
